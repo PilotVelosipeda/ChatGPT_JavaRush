@@ -48,6 +48,35 @@ public class TinderBoltApp extends MultiSessionTelegramBot {
             return;
         }
 
+        //command DATE
+        if (massage.equals("/date")) {
+            currentMode = DialogMode.DATE;
+            sendPhotoMessage("date");
+            sendTextButtonsMessage("Выберите девушку, которую хотите пригласить на свидание",
+                    "Ариана Гранде", "date_grande",
+                    "Марго Робби", "date_robbie",
+                    "Зендея", "date_zendaya",
+                    "Райн Гослинг", "date_gosling",
+                    "Том Харли", "date_hardy");
+            return;
+        }
+
+        if (currentMode == DialogMode.DATE) {
+            String query = getCallbackQueryButtonKey();
+            if (query.startsWith("date_")) {
+                sendPhotoMessage(query);
+                sendTextMessage("Отличный выбор! \n Твоя задача пригласить девушку на свидание ❤\uFE0F за 5 сообщений.");
+
+                String prompt = loadPrompt(query);
+                chatGpt.setPrompt(prompt);
+                return;
+            }
+
+            String answer = chatGpt.addMessage(massage);
+            sendTextMessage(answer);
+            return;
+        }
+
         if (currentMode == DialogMode.GPT) {
             String prompt = loadPrompt("gpt");
             String answer = chatGpt.sendMessage("Ответ на вопрос: ", massage);
